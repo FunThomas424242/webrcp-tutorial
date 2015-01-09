@@ -104,7 +104,7 @@ public class WebRCP {
 	/*
 	 * Eclipse launcher constants
 	 */
-	private static final String LAUNCHER_CLASS = "org.eclipse.equinox.launcher.Main";
+	private static final String LAUNCHER_CLASS = "jnlp.WebRCP.launcherclass";
 	private static final String LAUNCHER_JAR = "jnlp.WebRCP.launcherjar";
 
 	/*
@@ -298,20 +298,25 @@ public class WebRCP {
 	/*
 	 * Load and start eclipse launcher org.eclipse.core.launcher.Main
 	 */
-	private static void startLauncher(URL url, String os, String arch,
+	private static void startLauncher(String url, String os, String arch,
 			String arg) {
-		try {
+		URLClassLoader urlClassLoader = null;
+		try { 
 			// Reload new policy which allows all to all codebases
 			// because the default policy doesn't apply to the code loaded from
 			// startup.jar!!!
 			Policy.setPolicy(new AllPermissionPolicy());
 
-			final String path = url + getSystemProperty(LAUNCHER_JAR);
+			final String path = "file:"+url + File.separator+ getSystemProperty(LAUNCHER_JAR);
 			System.out.println("launcher jar: " + path);
-
-			URLClassLoader classLoader = new URLClassLoader(
+			final String launcherClassName=getSystemProperty(LAUNCHER_CLASS);
+			//TODO
+			printInfoBox("Launcher Jar", path);
+			printInfoBox("Launcher Class", launcherClassName);
+			
+			urlClassLoader = new URLClassLoader(
 					new URL[] { new URL(path) });
-			Class<?> launcher = classLoader.loadClass(LAUNCHER_CLASS);
+			Class<?> launcher = urlClassLoader.loadClass(launcherClassName);
 			Method launcherMain = launcher.getMethod("main",
 					new Class[] { String.class });
 
@@ -340,6 +345,15 @@ public class WebRCP {
 		} catch (MalformedURLException ex) {
 			// This shouldn't happen.
 			throw new RuntimeException(ex);
+		}finally{
+			if(urlClassLoader!=null){
+				try {
+					urlClassLoader.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -551,13 +565,14 @@ public class WebRCP {
 		createDesktopShortcutToExe(unpackDestDir.getPath() + File.separator + executable,
 				appName);
 
-		try {
+		//try {
 			// Then start the launcher!
-			startLauncher(unpackDestDir.toURI().toURL(), os, arch, launcherArg);
-		} catch (MalformedURLException ex) {
-			// This shouldn't happen.
-			throw new RuntimeException(ex);
-		}
+			//startLauncher(unpackDestDir.toURI().toURL(), os, arch, launcherArg);
+			startLauncher(unpackDestDir.getPath(), os, arch, launcherArg);
+//		} catch (MalformedURLException ex) {
+//			// This shouldn't happen.
+//			throw new RuntimeException(ex);
+//		}
 	}
 
 	private static void printSystemProperties() {

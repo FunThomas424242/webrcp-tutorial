@@ -38,7 +38,8 @@
 	   	<property name="jnlp.WebRCP.sysArchives" value="@SYS_ARCHIVES@"/>
 	   	<property name="jnlp.WebRCP.executable" value="@EXECUTABLE@"/>
 	   	<property name="jnlp.WebRCP.singleInstance" value="false"/>
-	   	<property name="jnlp.WebRCP.launcherjar" value="@EQUINOX_LAUNCHER@"/>
+	   	<property name="jnlp.WebRCP.launcherjar" value="@LAUNCHER_JAR@"/>
+	   	<property name="jnlp.WebRCP.launcherclass" value="@LAUNCHER_CLASS@"/>
 		
 		<!-- more custom properties -->
 		<!-- will be loaded and set as System Property without the jnlp.custom part -->

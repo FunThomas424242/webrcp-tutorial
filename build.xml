@@ -85,7 +85,8 @@
 				<filter token="ARCHIVES" value="${app.archives}" />
 				<filter token="SYS_ARCHIVES" value="${app.sys.archives}" />
 				<filter token="EXECUTABLE" value="${app.executable}" />
-				<filter token="EQUINOX_LAUNCHER" value="${eclipse.equinox.launcher}" />
+				<filter token="LAUNCHER_JAR" value="${launcher.jar}" />
+				<filter token="LAUNCHER_CLASS" value="${launcher.class}" />
 			</filterset>
 		</copy>
 		<copy todir="." overwrite="true" filtering="true">
