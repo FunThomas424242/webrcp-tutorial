@@ -301,25 +301,24 @@ public class WebRCP {
 	private static void startLauncher(String url, String os, String arch,
 			String arg) {
 		URLClassLoader urlClassLoader = null;
-		try { 
+		try {
 			// Reload new policy which allows all to all codebases
 			// because the default policy doesn't apply to the code loaded from
 			// startup.jar!!!
 			Policy.setPolicy(new AllPermissionPolicy());
 
-			final String path = "file:"+url + File.separator+ getSystemProperty(LAUNCHER_JAR);
+			final String path = "file:" + url + File.separator
+					+ getSystemProperty(LAUNCHER_JAR);
 			System.out.println("launcher jar: " + path);
-			final String launcherClassName=getSystemProperty(LAUNCHER_CLASS);
-			//TODO
+			final String launcherClassName = getSystemProperty(LAUNCHER_CLASS);
+			// TODO
 			printInfoBox("Launcher Jar", path);
 			printInfoBox("Launcher Class", launcherClassName);
-			
-			urlClassLoader = new URLClassLoader(
-					new URL[] { new URL(path) });
-			Class<?> launcher = urlClassLoader.loadClass(launcherClassName);
-			Method launcherMain = launcher.getMethod("main",
-					new Class[] { String.class });
 
+			urlClassLoader = new URLClassLoader(new URL[] { new URL(path) });
+			Class<?> launcher = urlClassLoader.loadClass(launcherClassName);
+			final Method launcherMain = launcher.getMethod("main", String.class);
+			
 			/*
 			 * Start launcher with aurguments -os <operating-system> -ws
 			 * <window-system> -arch <system architecture> -install
@@ -328,10 +327,20 @@ public class WebRCP {
 			 * The default workspace directory is put under the installation
 			 * directory.
 			 */
-			launcherMain.invoke(null, new Object[] { "-os " + os + " -ws "
+			final String exeCommand = "-os " + os + " -ws "
 					+ getWindowSystem(os) + " -arch " + arch + " -install "
 					+ url + " -data " + url + "/workspace/ -user " + url
-					+ "/workspace/ -nl " + Locale.getDefault() + arg });
+					+ "/workspace/ -nl " + Locale.getDefault() + arg;
+
+			printInfoBox("Launcher Command", exeCommand == null ? "null"
+					: exeCommand);
+
+			launcherMain.invoke(null,  exeCommand );
+			
+			//java -cp startup.jar org.eclipse.core.launcher.Main -os linux -ws gtk -arch amd64 -install /tmp/WebRCP Tutorial/unpacked -data /tmp/WebRCP Tutorial/unpacked/workspace/ -user /tmp/WebRCP Tutorial/unpacked/workspace/ -nl de_DE -product org.eclipse.ui.tutorials.rcp.part3.RcpApplication
+
+			
+			
 		} catch (InvocationTargetException ex) {
 			handleError("Startup Error", "Invocation failed: " + ex.getCause());
 		} catch (IllegalAccessException ex) {
@@ -345,8 +354,8 @@ public class WebRCP {
 		} catch (MalformedURLException ex) {
 			// This shouldn't happen.
 			throw new RuntimeException(ex);
-		}finally{
-			if(urlClassLoader!=null){
+		} finally {
+			if (urlClassLoader != null) {
 				try {
 					urlClassLoader.close();
 				} catch (IOException e) {
@@ -430,12 +439,12 @@ public class WebRCP {
 
 			final String userHomeDir = System.getProperty("user.home");
 			final String os = determineOS();
-			String shortCutDirName="Desktop";
-			if(os.equals(OS_LINUX)){
-				shortCutDirName="Schreibtisch";
+			String shortCutDirName = "Desktop";
+			if (os.equals(OS_LINUX)) {
+				shortCutDirName = "Schreibtisch";
 			}
-			final String shortCutFileName=userHomeDir + File.separator+shortCutDirName+File.separator
-					+ appName + ".lnk";
+			final String shortCutFileName = userHomeDir + File.separator
+					+ shortCutDirName + File.separator + appName + ".lnk";
 			OutputStream outStream = new FileOutputStream(shortCutFileName);
 			outStream.write(scut.getBytes());
 			outStream.flush();
@@ -527,16 +536,16 @@ public class WebRCP {
 
 		// Download and unpack system-independant archives
 		for (String element : archive) {
-			File destFile = new File(tempDir,element + ".zip");
-			
+			File destFile = new File(tempDir, element + ".zip");
+
 			if (!destFile.exists() || override) {
 
 				try {
-					final URL archiveURL = new URL(baseURL + element + ".zip");
+					final URL archiveURL = new URL(baseURL + "archives/"+ element + ".zip");
 					// TODO
 					final String message = archiveURL == null ? "null"
 							: archiveURL.toString();
-					printInfoBox("URL", message);
+					printInfoBox("URL "+element, message);
 					if (archiveURL != null) {
 						downloadFile(archiveURL, destFile);
 					}
@@ -562,17 +571,17 @@ public class WebRCP {
 		// create dekstop shortcut
 		String executable = System.getProperty(PROPERTY_EXECUTABLE);
 
-		createDesktopShortcutToExe(unpackDestDir.getPath() + File.separator + executable,
-				appName);
+		createDesktopShortcutToExe(unpackDestDir.getPath() + File.separator
+				+ executable, appName);
 
-		//try {
-			// Then start the launcher!
-			//startLauncher(unpackDestDir.toURI().toURL(), os, arch, launcherArg);
-			startLauncher(unpackDestDir.getPath(), os, arch, launcherArg);
-//		} catch (MalformedURLException ex) {
-//			// This shouldn't happen.
-//			throw new RuntimeException(ex);
-//		}
+		// try {
+		// Then start the launcher!
+		// startLauncher(unpackDestDir.toURI().toURL(), os, arch, launcherArg);
+		startLauncher(unpackDestDir.getPath(), os, arch, launcherArg);
+		// } catch (MalformedURLException ex) {
+		// // This shouldn't happen.
+		// throw new RuntimeException(ex);
+		// }
 	}
 
 	private static void printSystemProperties() {

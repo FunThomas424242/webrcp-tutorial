@@ -42,6 +42,9 @@
 	   	<property name="jnlp.WebRCP.launcherclass" value="@LAUNCHER_CLASS@"/>
 		
 		<!-- more custom properties -->
+		<property name="osgi.bundles" value="org.eclipse.core.runtime@2:start, org.eclipse.update.configurator@3:start"/>
+        <property name="eclipse.application" value="org.eclipse.ui.tutorials.rcp.part3.RcpApplication"/>
+        <property name="osgi.debug" value=""/>
 		<!-- will be loaded and set as System Property without the jnlp.custom part -->
   		<property name="jnlp.custom.java.security.auth.login.config" value="http://@SERVER@:@WEBPORT@/login.conf"/>
 		<property name="jnlp.custom.server" value="@SERVER@:@JNPPORT@"/>
