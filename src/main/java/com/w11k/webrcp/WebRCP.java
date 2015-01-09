@@ -44,127 +44,130 @@ import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 import javax.swing.Timer;
 
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
+
 /**
  * WebRCP - Web Start Application which acts as loader for an Eclipse RCP
  * application.
  * 
  * @author by Daniel Mendler <mendler@imedic.de>
  */
-public class WebRCP
-{
+public class WebRCP {
 	/*
 	 * Supported system architectures (From org.eclipse.core.runtime.Platform)
 	 */
-	private static final String ARCH_X86                = "x86";
-	private static final String ARCH_PA_RISC            = "PA_RISC";
-	private static final String ARCH_PPC                = "ppc";
-	private static final String ARCH_SPARC              = "sparc";
-	private static final String ARCH_AMD64              = "amd64";
-	private static final String ARCH_IA64               = "ia64";
+	private static final String ARCH_X86 = "x86";
+	private static final String ARCH_PA_RISC = "PA_RISC";
+	private static final String ARCH_PPC = "ppc";
+	private static final String ARCH_SPARC = "sparc";
+	private static final String ARCH_AMD64 = "amd64";
+	private static final String ARCH_IA64 = "ia64";
 
 	/*
 	 * Supported windowing systems (From org.eclipse.core.runtime.Platform)
 	 */
-	private static final String WS_WIN32                = "win32";
-	private static final String WS_MOTIF                = "motif";
-	private static final String WS_GTK                  = "gtk";
-	private static final String WS_PHOTON               = "photon";
-	private static final String WS_CARBON               = "carbon";
+	private static final String WS_WIN32 = "win32";
+	private static final String WS_MOTIF = "motif";
+	private static final String WS_GTK = "gtk";
+	private static final String WS_PHOTON = "photon";
+	private static final String WS_CARBON = "carbon";
 
 	/*
 	 * Supported operating systems (From org.eclipse.core.runtime.Platform)
 	 */
-	private static final String OS_WIN32                = "win32";
-	private static final String OS_LINUX                = "linux";
-	private static final String OS_AIX                  = "aix";
-	private static final String OS_SOLARIS              = "solaris";
-	private static final String OS_HPUX                 = "hpux";
-	private static final String OS_QNX                  = "qnx";
-	private static final String OS_MACOSX               = "macosx";
+	private static final String OS_WIN32 = "win32";
+	private static final String OS_LINUX = "linux";
+	private static final String OS_AIX = "aix";
+	private static final String OS_SOLARIS = "solaris";
+	private static final String OS_HPUX = "hpux";
+	private static final String OS_QNX = "qnx";
+	private static final String OS_MACOSX = "macosx";
 
 	/*
 	 * Configuration property names
 	 */
-	private static final String PROPERTY_BASEURL        = "jnlp.WebRCP.baseURL";
-	private static final String PROPERTY_APPNAME        = "jnlp.WebRCP.appName";
-	private static final String PROPERTY_APPVERSION     = "jnlp.WebRCP.appVersion";
-	private static final String PROPERTY_LAUNCHAPP      = "jnlp.WebRCP.launchApp";
-	private static final String PROPERTY_LAUNCHPRODUCT  = "jnlp.WebRCP.launchProduct";
-	private static final String PROPERTY_ARCHIVES       = "jnlp.WebRCP.archives";
-	private static final String PROPERTY_SINGLEINST     = "jnlp.WebRCP.singleInstance";
-	private static final String PROPERTY_EXECUTABLE     = "jnlp.WebRCP.executable";
+	private static final String PROPERTY_BASEURL = "jnlp.WebRCP.baseURL";
+	private static final String PROPERTY_APPNAME = "jnlp.WebRCP.appName";
+	private static final String PROPERTY_APPVERSION = "jnlp.WebRCP.appVersion";
+	private static final String PROPERTY_LAUNCHAPP = "jnlp.WebRCP.launchApp";
+	private static final String PROPERTY_LAUNCHPRODUCT = "jnlp.WebRCP.launchProduct";
+	private static final String PROPERTY_ARCHIVES = "jnlp.WebRCP.archives";
+	private static final String PROPERTY_SINGLEINST = "jnlp.WebRCP.singleInstance";
+	private static final String PROPERTY_EXECUTABLE = "jnlp.WebRCP.executable";
 
 	/*
 	 * Port used to check for a running instance. This port should be hopefully
 	 * unused.
 	 */
-	private static final int    SINGLEINST_PORT         = 25975;
+	private static final int SINGLEINST_PORT = 25975;
 
 	/*
 	 * Eclipse launcher constants
 	 */
-	private static final String LAUNCHER_CLASS          = "org.eclipse.equinox.launcher.Main";
-	private static final String LAUNCHER_JAR            = "jnlp.WebRCP.launcherjar";
+	private static final String LAUNCHER_CLASS = "org.eclipse.equinox.launcher.Main";
+	private static final String LAUNCHER_JAR = "jnlp.WebRCP.launcherjar";
 
 	/*
-	 * Try to determine system architecture by examining the system property "os.arch"
+	 * Try to determine system architecture by examining the system property
+	 * "os.arch"
 	 */
-	private static String determineArch()
-	{
+	private static String determineArch() {
 		String arch = System.getProperty("os.arch").toLowerCase();
 
-		if(arch.indexOf("x86") >= 0 || arch.matches("i.86"))
+		if (arch.indexOf("x86") >= 0 || arch.matches("i.86"))
 			return ARCH_X86;
 
-		if(arch.indexOf("ppc") >= 0 || arch.indexOf("power") >= 0)
+		if (arch.indexOf("ppc") >= 0 || arch.indexOf("power") >= 0)
 			return ARCH_PPC;
 
-		if(arch.indexOf("x86_64") >= 0 || arch.indexOf("amd64") >= 0)
+		if (arch.indexOf("x86_64") >= 0 || arch.indexOf("amd64") >= 0)
 			return ARCH_AMD64;
 
-		if(arch.indexOf("ia64") >= 0)
+		if (arch.indexOf("ia64") >= 0)
 			return ARCH_IA64;
 
-		if(arch.indexOf("risc") >= 0)
+		if (arch.indexOf("risc") >= 0)
 			return ARCH_PA_RISC;
 
-		if(arch.indexOf("sparc") >= 0)
+		if (arch.indexOf("sparc") >= 0)
 			return ARCH_SPARC;
 
-		handleError("Unknown Architecture", "Your system has an unknown architecture: " + arch);
+		handleError("Unknown Architecture",
+				"Your system has an unknown architecture: " + arch);
 
 		return null;
 	}
 
 	/*
-	 * Try to determine operating system by examining the system property "os.name"
+	 * Try to determine operating system by examining the system property
+	 * "os.name"
 	 */
-	private static String determineOS()
-	{
+	private static String determineOS() {
 		String os = System.getProperty("os.name").toLowerCase();
 
-		if(os.indexOf("linux") >= 0)
+		if (os.indexOf("linux") >= 0)
 			return OS_LINUX;
 
-		if(os.indexOf("mac") >= 0)
+		if (os.indexOf("mac") >= 0)
 			return OS_MACOSX;
 
-		if(os.indexOf("windows") >= 0)
+		if (os.indexOf("windows") >= 0)
 			return OS_WIN32;
 
-		if(os.indexOf("hp") >= 0 && os.indexOf("ux") >= 0)
+		if (os.indexOf("hp") >= 0 && os.indexOf("ux") >= 0)
 			return OS_HPUX;
 
-		if(os.indexOf("solaris") >= 0)
+		if (os.indexOf("solaris") >= 0)
 			return OS_SOLARIS;
 
-		if(os.indexOf("aix") >= 0)
+		if (os.indexOf("aix") >= 0)
 			return OS_AIX;
 
-		if(os.indexOf("qnx") >= 0)
+		if (os.indexOf("qnx") >= 0)
 			return OS_QNX;
 
-		handleError("Unknown Operating System", "Your operating system is unknown: " + os);
+		handleError("Unknown Operating System",
+				"Your operating system is unknown: " + os);
 
 		return null;
 	}
@@ -172,18 +175,17 @@ public class WebRCP
 	/*
 	 * Get window system by operating system name
 	 */
-	private static String getWindowSystem(String os)
-	{
-		if(os.equals(OS_WIN32))
+	private static String getWindowSystem(String os) {
+		if (os.equals(OS_WIN32))
 			return WS_WIN32;
 
-		if(os.equals(OS_LINUX))
+		if (os.equals(OS_LINUX))
 			return WS_GTK;
 
-		if(os.equals(OS_QNX))
+		if (os.equals(OS_QNX))
 			return WS_PHOTON;
 
-		if(os.equals(OS_MACOSX))
+		if (os.equals(OS_MACOSX))
 			return WS_CARBON;
 
 		return WS_MOTIF; // OS_AIX, OS_HPUX, OS_SOLARIS
@@ -192,67 +194,56 @@ public class WebRCP
 	/*
 	 * Ensure that there's only one application instance running.
 	 */
-	private static void ensureSingleInstance()
-	{
-		try
-		{
+	private static void ensureSingleInstance() {
+		try {
 			new ServerSocket(SINGLEINST_PORT);
-		}
-		catch(Exception ex)
-		{
-			handleError("Already running.", "There's already an instance running.");
+		} catch (Exception ex) {
+			handleError("Already running.",
+					"There's already an instance running.");
 		}
 	}
 
 	/*
 	 * Get base URL
 	 */
-	private static String getBaseURL()
-	{
-		try
-		{
-			BasicService service = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
+	private static String getBaseURL() {
+		try {
+			BasicService service = (BasicService) ServiceManager
+					.lookup("javax.jnlp.BasicService");
 			return service.getCodeBase().toString();
-		}
-		catch(UnavailableServiceException ex)
-		{
-			handleError("WebStart Service Error", "Service javax.jnlp.BasicService unvailable: " + ex);
+		} catch (UnavailableServiceException ex) {
+			handleError("WebStart Service Error",
+					"Service javax.jnlp.BasicService unvailable: " + ex);
 			return null;
 		}
 	}
 
 	/*
 	 * Check for new eclipse application version by comparing the value in the
-	 * version file and the version argument.
-	 * The version value can be an arbitrary string.
+	 * version file and the version argument. The version value can be an
+	 * arbitrary string.
 	 */
-	private static boolean newVersionAvailable(String newVersion, File versionFile)
-	{
+	private static boolean newVersionAvailable(String newVersion,
+			File versionFile) {
 		String oldVersion = null;
 
-		try
-		{
+		try {
 			// Read old version
 			BufferedReader in = new BufferedReader(new FileReader(versionFile));
 			oldVersion = in.readLine();
 			in.close();
-		}
-		catch(IOException ex)
-		{
+		} catch (IOException ex) {
 			// No error. File doesn't already exists.
 		}
 
-		try
-		{
+		try {
 			// Write new version
 			Writer out = new FileWriter(versionFile);
 			out.write(newVersion);
 			out.close();
 
 			return oldVersion == null || !newVersion.equals(oldVersion);
-		}
-		catch(IOException ex)
-		{
+		} catch (IOException ex) {
 			// Not too bad. We continue.
 			return true;
 		}
@@ -262,10 +253,8 @@ public class WebRCP
 	 * Download a file from an url and store it at destFile. A progress monitor
 	 * will be shown.
 	 */
-	private static void downloadFile(URL url, File destFile)
-	{
-		try
-		{
+	private static void downloadFile(URL url, File destFile) {
+		try {
 			OutputStream out = new FileOutputStream(destFile);
 
 			URLConnection conn = url.openConnection();
@@ -274,11 +263,12 @@ public class WebRCP
 			int totalSize = conn.getContentLength(), downloadedSize = 0, size;
 			byte[] buffer = new byte[32768];
 
-			ProgressMonitor pm = createProgressMonitor("Downloading " + url, totalSize);
+			ProgressMonitor pm = createProgressMonitor("Downloading " + url,
+					totalSize);
 			boolean canceled = false;
 
-			while((size = in.read(buffer)) > 0 && !(canceled = pm.isCanceled()))
-			{
+			while ((size = in.read(buffer)) > 0
+					&& !(canceled = pm.isCanceled())) {
 				out.write(buffer, 0, size);
 				pm.setProgress(downloadedSize += size);
 				// pm.setNote(downloadedSize / totalSize + "% finished");
@@ -287,27 +277,30 @@ public class WebRCP
 			in.close();
 			out.close();
 
-			if(canceled)
-			{
+			if (canceled) {
 				destFile.delete(); // Delete uncomplete file
-				handleError("Starting canceled", "Downloading canceled. Exiting...");
+				handleError("Starting canceled",
+						"Downloading canceled. Exiting...");
 			}
 
 			pm.close();
-		}
-		catch(IOException ex)
-		{
-			handleError("Download Error", "Couldn't download file: " + ex);
+		} catch (IOException ex) {
+			final StringBuilder builder = new StringBuilder();
+			final StackTraceElement[] arr = ex.getStackTrace();
+			for (StackTraceElement s : arr) {
+				builder.append(s.toString());
+			}
+			handleError("Download Error",
+					"Couldn't download file: " + builder.toString());
 		}
 	}
 
 	/*
 	 * Load and start eclipse launcher org.eclipse.core.launcher.Main
 	 */
-	private static void startLauncher(URL url, String os, String arch, String arg)
-	{
-		try
-		{
+	private static void startLauncher(URL url, String os, String arch,
+			String arg) {
+		try {
 			// Reload new policy which allows all to all codebases
 			// because the default policy doesn't apply to the code loaded from
 			// startup.jar!!!
@@ -316,9 +309,11 @@ public class WebRCP
 			final String path = url + getSystemProperty(LAUNCHER_JAR);
 			System.out.println("launcher jar: " + path);
 
-			URLClassLoader classLoader = new URLClassLoader(new URL[] { new URL(path) });
+			URLClassLoader classLoader = new URLClassLoader(
+					new URL[] { new URL(path) });
 			Class<?> launcher = classLoader.loadClass(LAUNCHER_CLASS);
-			Method launcherMain = launcher.getMethod("main", new Class[] { String.class });
+			Method launcherMain = launcher.getMethod("main",
+					new Class[] { String.class });
 
 			/*
 			 * Start launcher with aurguments -os <operating-system> -ws
@@ -328,32 +323,21 @@ public class WebRCP
 			 * The default workspace directory is put under the installation
 			 * directory.
 			 */
-			launcherMain.invoke(
-			        null,
-			        new Object[] { "-os " + os + " -ws " + getWindowSystem(os) + " -arch " + arch + " -install " + url
-			                + " -data " + url + "/workspace/ -user " + url + "/workspace/ -nl " + Locale.getDefault()
-			                + arg });
-		}
-		catch(InvocationTargetException ex)
-		{
+			launcherMain.invoke(null, new Object[] { "-os " + os + " -ws "
+					+ getWindowSystem(os) + " -arch " + arch + " -install "
+					+ url + " -data " + url + "/workspace/ -user " + url
+					+ "/workspace/ -nl " + Locale.getDefault() + arg });
+		} catch (InvocationTargetException ex) {
 			handleError("Startup Error", "Invocation failed: " + ex.getCause());
-		}
-		catch(IllegalAccessException ex)
-		{
+		} catch (IllegalAccessException ex) {
 			handleError("Startup Error", "Invocation failed: " + ex);
-		}
-		catch(NoSuchMethodException ex)
-		{
+		} catch (NoSuchMethodException ex) {
 			ex.printStackTrace();
 			handleError("Startup Error", "Invalid Eclipse Launcher: " + ex);
-		}
-		catch(ClassNotFoundException ex)
-		{
+		} catch (ClassNotFoundException ex) {
 			ex.printStackTrace();
 			handleError("Startup Error", "Eclipse Launcher not found: " + ex);
-		}
-		catch(MalformedURLException ex)
-		{
+		} catch (MalformedURLException ex) {
 			// This shouldn't happen.
 			throw new RuntimeException(ex);
 		}
@@ -362,8 +346,7 @@ public class WebRCP
 	/*
 	 * Convenience method to create a progress monitor
 	 */
-	private static ProgressMonitor createProgressMonitor(String message, int max)
-	{
+	private static ProgressMonitor createProgressMonitor(String message, int max) {
 		ProgressMonitor pm = new ProgressMonitor(null, message, "", 0, max);
 		pm.setMillisToDecideToPopup(100);
 		pm.setMillisToPopup(500);
@@ -374,26 +357,29 @@ public class WebRCP
 	/*
 	 * Convenience method to show an error dialog
 	 */
-	private static void handleError(String title, String message)
-	{
-		JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+	private static void handleError(String title, String message) {
+		JOptionPane.showMessageDialog(null, message, title,
+				JOptionPane.ERROR_MESSAGE);
 		System.exit(1);
+	}
+
+	private static void printInfoBox(String title, String message) {
+		JOptionPane.showMessageDialog(null, message, title,
+				JOptionPane.ERROR_MESSAGE);
 	}
 
 	/*
 	 * Simulate progress by showing a faked progress monitor
 	 */
-	private static void simulateProgress(String text, int seconds)
-	{
-		final ProgressMonitor pm = createProgressMonitor(text, seconds * 1000 / 50);
+	private static void simulateProgress(String text, int seconds) {
+		final ProgressMonitor pm = createProgressMonitor(text,
+				seconds * 1000 / 50);
 
 		Timer timer = new Timer(50, new ActionListener() {
 			private int progress = 0;
 
-			public void actionPerformed(ActionEvent event)
-			{
-				if(pm.isCanceled())
-				{
+			public void actionPerformed(ActionEvent event) {
+				if (pm.isCanceled()) {
 					System.exit(0);
 				}
 				pm.setProgress(progress += 1);
@@ -406,10 +392,9 @@ public class WebRCP
 	/*
 	 * Get system property or die
 	 */
-	private static String getSystemProperty(String key)
-	{
+	private static String getSystemProperty(String key) {
 		String value = System.getProperty(key);
-		if(value != null)
+		if (value != null)
 			return value;
 
 		handleError("Missing System Property", key + " is required");
@@ -421,38 +406,38 @@ public class WebRCP
 	 * Creates a shortcut on the users desktop to the passed target
 	 * 
 	 * @param shortcutTarget
-	 * @param appName 
+	 * @param appName
 	 */
-	private static void createDesktopShortcutToExe(String shortcutTarget, String appName)
-	{
+	private static void createDesktopShortcutToExe(String shortcutTarget,
+			String appName) {
 		Shortcut scut;
-		try
-		{
+		try {
 			scut = new Shortcut(new File(shortcutTarget));
 
-			String userHomeDir = System.getProperty("user.home");
-
-			OutputStream os = new FileOutputStream(userHomeDir + "\\Desktop\\" + appName + ".lnk");
-			os.write(scut.getBytes());
-			os.flush();
-			os.close();
-		}
-		catch(UnsupportedEncodingException e)
-		{
+			final String userHomeDir = System.getProperty("user.home");
+			final String os = determineOS();
+			String shortCutDirName="Desktop";
+			if(os.equals(OS_LINUX)){
+				shortCutDirName="Schreibtisch";
+			}
+			final String shortCutFileName=userHomeDir + File.separator+shortCutDirName+File.separator
+					+ appName + ".lnk";
+			OutputStream outStream = new FileOutputStream(shortCutFileName);
+			outStream.write(scut.getBytes());
+			outStream.flush();
+			outStream.close();
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
-			handleError(
-			        "Error while creating Desktop Shortcut",
-			        "Wrong Shortcut target specified" + e.getLocalizedMessage());
-		}
-		catch(FileNotFoundException e)
-		{
+			handleError("Error while creating Desktop Shortcut",
+					"Wrong Shortcut target specified" + e.getLocalizedMessage());
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			handleError("Error while creating Desktop Shortcut", "File not found" + e.getLocalizedMessage());
-		}
-		catch(IOException e)
-		{
+			handleError("Error while creating Desktop Shortcut",
+					"File not found" + e.getLocalizedMessage());
+		} catch (IOException e) {
 			e.printStackTrace();
-			handleError("Error while creating Desktop Shortcut", e.getLocalizedMessage());
+			handleError("Error while creating Desktop Shortcut",
+					e.getLocalizedMessage());
 		}
 	}
 
@@ -461,8 +446,7 @@ public class WebRCP
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		// http://stackoverflow.com/questions/19407102/java-7-update-45-broke-my-web-start-swt-application
 		Properties properties = System.getProperties();
 		// copy properties to avoid ConcurrentModificationException
@@ -470,48 +454,44 @@ public class WebRCP
 		copiedProperties.putAll(properties);
 		Set<Object> keys = copiedProperties.keySet();
 		for (Object key : keys) {
-		    if (key instanceof String) {
-		        String keyString = (String) key;
-		        if (keyString.startsWith("jnlp.custom.")) {
-		            // re set all properties starting with the jnlp.custom-prefix 
-		            // and set them without the prefix
-		            String property = System.getProperty(keyString);
-		            String replacedKeyString = keyString.replaceFirst("jnlp.custom.", "");
+			if (key instanceof String) {
+				String keyString = (String) key;
+				if (keyString.startsWith("jnlp.custom.")) {
+					// re set all properties starting with the
+					// jnlp.custom-prefix
+					// and set them without the prefix
+					String property = System.getProperty(keyString);
+					String replacedKeyString = keyString.replaceFirst(
+							"jnlp.custom.", "");
 
-		            System.setProperty(replacedKeyString, property);
-		        }
-		    }
+					System.setProperty(replacedKeyString, property);
+				}
+			}
 		}
-		
-		if(Boolean.getBoolean(PROPERTY_SINGLEINST))
-		{
+
+		if (Boolean.getBoolean(PROPERTY_SINGLEINST)) {
 			ensureSingleInstance();
 		}
 
 		// Get required properties
 		String appName = getSystemProperty(PROPERTY_APPNAME);
 		String appVersion = getSystemProperty(PROPERTY_APPVERSION);
-		String[] archive = getSystemProperty(PROPERTY_ARCHIVES).split("\\s*,\\s*");
+		String[] archive = getSystemProperty(PROPERTY_ARCHIVES).split(
+				"\\s*,\\s*");
 
 		// Get application/product to launch
 		String launcherArg = System.getProperty(PROPERTY_LAUNCHAPP);
 
-		if(launcherArg == null)
-		{
+		if (launcherArg == null) {
 			launcherArg = System.getProperty(PROPERTY_LAUNCHPRODUCT);
 
-			if(launcherArg == null)
-			{
-				handleError("Missing System Property", PROPERTY_LAUNCHAPP + " or " + PROPERTY_LAUNCHPRODUCT
-				        + " are required");
-			}
-			else
-			{
+			if (launcherArg == null) {
+				handleError("Missing System Property", PROPERTY_LAUNCHAPP
+						+ " or " + PROPERTY_LAUNCHPRODUCT + " are required");
+			} else {
 				launcherArg = " -product " + launcherArg;
 			}
-		}
-		else
-		{
+		} else {
 			launcherArg = " -application " + launcherArg;
 		}
 
@@ -525,24 +505,28 @@ public class WebRCP
 		File unpackDestDir = new File(tempDir, "unpacked");
 
 		// Check for new version
-		boolean override = newVersionAvailable(appVersion, new File(tempDir, "version"));
+		boolean override = newVersionAvailable(appVersion, new File(tempDir,
+				"version"));
 
 		// Start background thread for unpacking
 		UnpackThread unpackThread = new UnpackThread(unpackDestDir, override);
 
 		// Download and unpack system-independant archives
-		for(String element: archive)
-		{
-			File destFile = new File(tempDir, element + ".zip");
+		for (String element : archive) {
+			File destFile = new File(tempDir,element + ".zip");
+			
+			if (!destFile.exists() || override) {
 
-			if(!destFile.exists() || override)
-			{
-				try
-				{
-					downloadFile(new URL(baseURL + element + ".zip"), destFile);
-				}
-				catch(MalformedURLException ex)
-				{
+				try {
+					final URL archiveURL = new URL(baseURL + element + ".zip");
+					// TODO
+					final String message = archiveURL == null ? "null"
+							: archiveURL.toString();
+					printInfoBox("URL", message);
+					if (archiveURL != null) {
+						downloadFile(archiveURL, destFile);
+					}
+				} catch (MalformedURLException ex) {
 					// This shouldn't happen.
 					throw new RuntimeException(ex);
 				}
@@ -564,29 +548,33 @@ public class WebRCP
 		// create dekstop shortcut
 		String executable = System.getProperty(PROPERTY_EXECUTABLE);
 
-		createDesktopShortcutToExe(unpackDestDir.getPath() + "\\" + executable, appName);
+		createDesktopShortcutToExe(unpackDestDir.getPath() + File.separator + executable,
+				appName);
 
-		try
-		{
+		try {
 			// Then start the launcher!
 			startLauncher(unpackDestDir.toURI().toURL(), os, arch, launcherArg);
-		}
-		catch(MalformedURLException ex)
-		{
+		} catch (MalformedURLException ex) {
 			// This shouldn't happen.
 			throw new RuntimeException(ex);
 		}
 	}
 
-	private static void printSystemProperties()
-	{
+	private static void printSystemProperties() {
 		Properties p = System.getProperties();
 		Enumeration keys = p.keys();
-		while(keys.hasMoreElements())
-		{
+		while (keys.hasMoreElements()) {
 			String key = (String) keys.nextElement();
 			String value = (String) p.get(key);
 			System.out.println(key + ": " + value);
 		}
+	}
+
+	public static URL getResource(final String resourcePath) {
+		final ClassLoader classLoader = Thread.currentThread()
+				.getContextClassLoader();
+		// final ClassLoader classLoader = this.getClass().getClassLoader();
+		final URL resourceURL = classLoader.getResource(resourcePath);
+		return resourceURL;
 	}
 }

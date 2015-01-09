@@ -59,6 +59,9 @@
 
 	<!-- Create html and jsp -->
 	<target name="jsp" depends="sign" description="Create jsp">
+		<copy todir="web/archives" overwrite="true" filtering="false" flatten="true">
+			<fileset dir="src/main/resources/archives" includes="**/*.zip" />
+		</copy>
 		<copy todir="web" overwrite="true">
 			<fileset dir="src/main/resources">
 				<include name="index.html" />
