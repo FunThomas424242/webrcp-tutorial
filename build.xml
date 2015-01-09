@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="webrcp-tutorial" default="sign" basedir=".">
+
+	<property file="etc/build.properties" />
+	<property file="etc/users/${user.name}.properties" />
+
+	<path id="build.class.path">
+		<fileset dir="lib/">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<!-- Make all -->
+	<target name="all" depends="clean,compile,binary,sign,war" description="Make all" />
+
+	<!-- Clean workspace -->
+	<target name="clean" description="Clean workspace">
+		<delete dir="target" />
+		<delete dir="web" />
+		<delete file="install-tomcat.pp" />
+		<delete file="undeploy-from-tomcat.pp" />
+		<delete file="deploy-at-tomcat.pp" />
+	</target>
+
+	<!-- Compile sources -->
+	<target name="compile" depends="clean" description="Compile sources">
+		<mkdir dir="target/classes" />
+		<javac srcdir="src/main/java" classpathref="build.class.path" destdir="target/classes" debug="false" optimize="on" deprecation="on" />
+	</target>
+
+	<!-- Create binary -->
+	<target name="binary" depends="compile" description="Create binary">
+		<jar jarfile="web/webrcp.jar">
+			<fileset dir="target/classes" />
+			<manifest>
+				<attribute name="Main-Class" value="com.w11k.webrcp.WebRCP" />
+				<attribute name="Permissions" value="all-permissions" />
+				<attribute name="Codebase" value="${codebase.url}" />
+				<attribute name="Application-Name" value="${app.name}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- Sign jar -->
+	<target name="sign" depends="binary">
+		<signjar keystore="${keystore.file}" alias="${keystore.alias}" storepass="${keystore.storepass}">
+			<fileset dir="web/">
+				<include name="*.jar" />
+			</fileset>
+		</signjar>
+	</target>
+
+	<!-- Build war -->
+	<target name="war" depends="jsp">
+		<war destfile="${war.filename}">
+			<fileset dir="web" includes="**/*.*" />
+		</war>
+	</target>
+
+	<!-- Create html and jsp -->
+	<target name="jsp" depends="sign" description="Create jsp">
+		<copy todir="web" overwrite="true">
+			<fileset dir="src/main/resources">
+				<include name="index.html" />
+				<include name="tutorial.jsp" />
+				<include name="WEB-INF/**" />
+				<include name="icon.jpeg" />
+			</fileset>
+			<filterset>
+				<filter token="BUILD_VERSION" value="${build.version}" />
+				<filter token="RELEASE_CANDIDATE" value="${release.candidate}" />
+				<filter token="BUILD_DATE" value="${build.date}" />
+				<filter token="BUILD_TIME" value="${build.time}" />
+				<filter token="BUILD_NUMBER" value="${build.number}" />
+
+				<filter token="APP_NAME" value="${app.name}" />
+				<filter token="VENDOR" value="${app.vendor}" />
+				<filter token="DESCRIPTION" value="${app.description}" />
+				<filter token="URL" value="${app.url}" />
+				<filter token="ICON" value="${app.icon}" />
+				<filter token="LAUNCH_PRODCUT" value="${app.launch.product}" />
+				<filter token="ARCHIVES" value="${app.archives}" />
+				<filter token="SYS_ARCHIVES" value="${app.sys.archives}" />
+				<filter token="EXECUTABLE" value="${app.executable}" />
+				<filter token="EQUINOX_LAUNCHER" value="${eclipse.equinox.launcher}" />
+			</filterset>
+		</copy>
+		<copy todir="." overwrite="true" filtering="true">
+			<fileset dir="etc">
+				<include name="deploy-at-tomcat.pp" />
+				<include name="undeploy-from-tomcat.pp" />
+				<include name="install-tomcat.pp" />
+			</fileset>
+			<filterset>
+				<filter token="BASE_DIR" value="${basedir}" />
+				<filter token="WAR_FILE" value="${war.filename}" />
+			</filterset>
+		</copy>
+	</target>
+
+</project>
