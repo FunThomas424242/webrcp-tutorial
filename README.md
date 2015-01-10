@@ -19,10 +19,10 @@ da generell bei allen 3 Projekten von der Anwendung der EPL Lizenz auszugehen is
 
 *Aktueller Projekt Status:*
 * Build und Deployment auf einen lokalen Tomcat funktioniert mittels puppet.
-* Die Das Tutorial lässt sich unter http://localhost:8080/webrcp-tutorial aufrufen
+* Das Tutorial lässt sich unter http://localhost:8080/webrcp-tutorial aufrufen
 * Nack Klick auf den Link werden alle benötigten Archive aufs lokale Filesystem geladen (teilweise sind für Debugging Zwecke Popups eingebaut - die bestätigt werden müssen)
 * Der eclipse Starter org.eclipse.core.launcher.Main wird mit den originalen Parametern aufgerufen.
 * *Der Starter startet nicht korrekt.*
 
-The project was formerly hosted on http://sourceforge.net/projects/webrcp/
+Das Original Projekt stammt von  http://sourceforge.net/projects/webrcp/
 
