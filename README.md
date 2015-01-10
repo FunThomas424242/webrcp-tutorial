@@ -1,23 +1,28 @@
-# WebRCP
+# WebRCP Tutorial
 
-WebRCP is a framework for launching Eclipse RCP-Applications with Java Web Start. WebRCP supports the most common platforms.
+WebRCP Tutorial ist der Versuch das  Tutorial des Original [WebRCP Projektes](http://sourceforge.net/projects/webrcp/), gehostet auf Sourceforge.net, wieder zum Laufen zu bekommen.
 
-## Features
+Hintergrund: 
+Die letzte Aktivität im Originalprojekt auf Sourceforge.net  stammt aus dem Jahre 2013. Seit dem gab es einige Änderungen im Java und Eclipse Umfeld wodurch das 
+Projekt wenn überhaupt nur noch eingeschränkt genutzt werden kann.  
+Diese Problematik erkannte offenbar bereits das Projekt [w11k/webrcp](https://github.com/w11k/webrcp) auf Github und nahm entsprechende Anpassungen vor. 
 
-* Download and unpack your generated RCP archive
-* Launch the given Eclipse RCP Product file
+Bedauerlicherweise wurde im Rahmen des w11k/webrcp Projektes das ursprüngliche Tutorial nicht mit auf den neuen Technologiestack portiert. 
+Das wird mit diesem Projekt hier versucht. 
 
-## Getting Started
+Da im w11k/webrcp Projekt keine Lizenz angegeben ist wird hier die ursprüngliche Lizenz (EPL) des Projektes von Sourceforge.net angenommen. 
+Es sei an dieser Stelle darauf hingewiesen, dass die verwendeten Quellen zum Webstart Mechanismus  alle dem Projekt w11k/webrcp auf Github 
+entnommen wurden und nur die Bibliotheken zum Tutorial selbst von sourceforge verwendet wurden. 
 
-* Import the project into your eclipse workspace
-* Write your own property file or pass in the properties from your given build system
-* Generate the jar file (and the index.html, plus *.jsp if needed)
-* Deliver the generated files with your server
+Rechtlich stellen die Quellen hier also einen Mix aus den Projekten webrcp auf sourceforge und w11k/webrcp auf  Github dar. Das ist aber kein Problem
+da generell bei allen 3 Projekten von der Anwendung der EPL Lizenz auszugehen ist. 
 
-## Serving custom properties
-Custom properties in your *.jnlp or *.jsp file, should be marked as "jnlp.custom.".
-WebRCP than removes the jnlp.custom prefix and sets property as a new Systemproperty.
-
-## Miscellaneous
+*Aktueller Projekt Status:*
+* Build und Deployment auf einen lokalen Tomcat funktioniert mittels puppet.
+* Die Das Tutorial lässt sich unter http://localhost:8080/webrcp-tutorial aufrufen
+* Nack Klick auf den Link werden alle benötigten Archive aufs lokale Filesystem geladen (teilweise sind für Debugging Zwecke Popups eingebaut - die bestätigt werden müssen)
+* Der eclipse Starter org.eclipse.core.launcher.Main wird mit den originalen Parametern aufgerufen.
+* *Der Starter startet nicht korrekt.*
 
 The project was formerly hosted on http://sourceforge.net/projects/webrcp/
+
